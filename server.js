@@ -11,17 +11,6 @@ const ACCESS_TOKEN_CHIRPSTACK = process.env.ACCESS_TOKEN_CHIRPSTACK;
 
 app.use(express.json());
 
-// API nhận request từ ThingsBoard
-// app.post("/thingsboard/webhook", async (req, res) => {
-//   try {
-//     console.log("Received data:", req.body);
-//     res.status(200).json({ message: "Received successfully" });
-//   } catch (error) {
-//     console.error("Error processing request:", error);
-//     res.status(500).json({ error: "Internal server error" });
-//   }
-// });
-
 app.get("/actions", async (req, res) => {
   try {
     const response = await axios.post(
@@ -82,9 +71,6 @@ app.get("/actions", async (req, res) => {
         ),
       ]);
 
-      // console.log("telemetry", telemetryRes.data);
-      // console.log("attribute", attributesRes.data);
-
       const telemetryData = telemetryRes.data.data_UID[0];
       const dataUid = telemetryData.value;
 
@@ -141,41 +127,7 @@ function encodeHexString(data_UID) {
 }
 
 function decodeHexToBase64(hexString) {
-  const base64Chars =
-    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
-  let binaryStr = "";
-
-  for (let i = 0; i < hexString.length; i += 2) {
-    let byte = parseInt(hexString.substring(i, i + 2), 16);
-    binaryStr += String.fromCharCode(byte);
-  }
-
-  let result = "";
-  let padding = "";
-
-  if (binaryStr.length % 3 === 1) {
-    padding = "==";
-    binaryStr += "\0\0";
-  } else if (binaryStr.length % 3 === 2) {
-    padding = "=";
-    binaryStr += "\0";
-  }
-
-  // Chuyển từ nhị phân sang Base64
-  for (let i = 0; i < binaryStr.length; i += 3) {
-    let n =
-      (binaryStr.charCodeAt(i) << 16) |
-      (binaryStr.charCodeAt(i + 1) << 8) |
-      binaryStr.charCodeAt(i + 2);
-
-    result +=
-      base64Chars[(n >> 18) & 63] +
-      base64Chars[(n >> 12) & 63] +
-      base64Chars[(n >> 6) & 63] +
-      base64Chars[n & 63];
-  }
-
-  return result.substring(0, result.length - padding.length) + padding;
+  return Buffer.from(hexString, "hex").toString("base64");
 }
 
 app.listen(PORT, () => {
