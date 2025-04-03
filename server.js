@@ -16,12 +16,11 @@ app.get("/", (req, res) => {
 });
 
 app.get("/actions", async (req, res) => {
-  
   const assetId = req.body.assetId;
   const statusLight = req.body.statusLight;
 
-  console.log(req.body.assetId);
-  console.log(req.body.statusLight);
+  // console.log(req.body.assetId);
+  // console.log(req.body.statusLight);
 
   try {
     const response = await axios.post(
@@ -132,7 +131,6 @@ function encodeHexString(data_UID, status_Light) {
   } else if (status_Light === "Light Off") {
     actionHex = "22";
     dimmingLevel = "00";
-
   } else {
     return { error: "Invalid light action" };
   }
