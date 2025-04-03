@@ -16,8 +16,9 @@ app.get("/", (req, res) => {
 });
 
 app.get("/actions", async (req, res) => {
-  const assetId = req.body.assetId;
-  const statusLight = req.body.statusLight;
+  const { assetId, statusLight } = req.body;
+
+  console.log("object", req.body);
 
   // console.log(req.body.assetId);
   // console.log(req.body.statusLight);
