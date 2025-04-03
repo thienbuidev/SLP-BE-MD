@@ -11,6 +11,10 @@ const ACCESS_TOKEN_CHIRPSTACK = process.env.ACCESS_TOKEN_CHIRPSTACK;
 
 app.use(express.json());
 
+app.get("/", (req, res) => {
+  res.send("Server is up and running!");
+});
+
 app.get("/actions", async (req, res) => {
   try {
     const response = await axios.post(
