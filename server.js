@@ -16,13 +16,21 @@ app.get("/", (req, res) => {
 });
 
 app.get("/actions", async (req, res) => {
+  
+  const assetId = req.body.assetId;
+  const statusLight = req.body.statusLight;
+
+  console.log(req.body.assetId);
+  console.log(req.body.statusLight);
+
   try {
     const response = await axios.post(
       `${THINGSBOARD_URL}/api/relations`,
       {
         parameters: {
-          rootId: "55bc74d0-e90f-11ef-87c3-b9314a2c2c87",
-          rootType: "ASSET",
+          // rootId: "55bc74d0-e90f-11ef-87c3-b9314a2c2c87",
+          rootId: assetId,
+          rootType: "DEVICE",
           direction: "FROM",
           relationTypeGroup: "COMMON",
           maxLevel: 1073741824,
@@ -81,10 +89,10 @@ app.get("/actions", async (req, res) => {
       const attributesData = attributesRes.data[0];
       const devEui = attributesData.value;
 
-      const hexString = encodeHexString(dataUid);
+      const hexString = encodeHexString(dataUid, statusLight);
       const base64String = decodeHexToBase64(hexString);
-      console.log("base64String", base64String);
-      console.log("hexString", hexString);
+      // console.log("base64String", base64String);
+      // console.log("hexString", hexString);
       // CALL API CHIRPSTACK (Multicast)
       await new Promise((resolve) => setTimeout(resolve, 6000));
 
@@ -104,7 +112,7 @@ app.get("/actions", async (req, res) => {
           },
         }
       );
-      console.log("chirpstackRes", chirpstackRes);
+      console.log("chirpstackRes", chirpstackRes.data);
     }
     res.status(200).json({ message: "Received successfully" });
   } catch (error) {
@@ -113,11 +121,23 @@ app.get("/actions", async (req, res) => {
   }
 });
 
-function encodeHexString(data_UID) {
+function encodeHexString(data_UID, status_Light) {
   const fixedValues = "680106F0002001";
   const uidHex = data_UID.toUpperCase();
-  const actionHex = "22";
-  const dimmingLevel = "00";
+  let actionHex;
+  let dimmingLevel;
+  if (status_Light === "Light On") {
+    actionHex = "21";
+    dimmingLevel = "64";
+  } else if (status_Light === "Light Off") {
+    actionHex = "22";
+    dimmingLevel = "00";
+
+  } else {
+    return { error: "Invalid light action" };
+  }
+  // const actionHex = "21";
+  // const dimmingLevel = "64";
 
   const hexStringWithoutChecksum = `68${uidHex}${fixedValues}${actionHex}${dimmingLevel}`;
 
