@@ -112,8 +112,8 @@ app.get("/actions", async (req, res) => {
 function encodeHexString(data_UID) {
   const fixedValues = "680106F0002001";
   const uidHex = data_UID.toUpperCase();
-  const actionHex = "22";
-  const dimmingLevel = "00";
+  const actionHex = "21";
+  const dimmingLevel = "64";
 
   const hexStringWithoutChecksum = `68${uidHex}${fixedValues}${actionHex}${dimmingLevel}`;
 
